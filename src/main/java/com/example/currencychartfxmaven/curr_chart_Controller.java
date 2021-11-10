@@ -746,6 +746,42 @@ public class curr_chart_Controller {
 
             // создать индекс, если его нет
             statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS UK_CURS ON CURS (CURS_DATE, CURR_CODE);");
+
+            // создать представление, если его нет
+            statement.executeUpdate("CREATE VIEW IF NOT EXISTS CURS_AVG_YEAR\n" +
+                    "AS\n" +
+                    "SELECT SUBSTR(k.CURS_DATE, 1, 4) as PART_DATE,\n" +
+                    "       k.CURR_CODE,\n" +
+                    "       avg(k.RATE) as AVG_RATE\n" +
+                    "FROM CURS k\n" +
+                    "GROUP BY substr(k.CURS_DATE, 1, 4), k.CURR_CODE;");
+
+            // создать представление, если его нет
+            statement.executeUpdate("CREATE VIEW IF NOT EXISTS CURS_AVG\n" +
+                    "AS\n" +
+                    "SELECT f.PART_DATE,\n" +
+                    "       f.CURR_CODE,\n" +
+                    "\t   AVG(f.AVG_RATE) as AVG_RATE\n" +
+                    "FROM (\n" +
+                    "SELECT substr(k.CURS_DATE, 6,5) as PART_DATE,\n" +
+                    "       k.CURR_CODE,\n" +
+                    "       (k.RATE/a.AVG_RATE)*100 as AVG_RATE \n" +
+                    "FROM CURS k\n" +
+                    "INNER JOIN CURS_AVG_YEAR a ON a.PART_DATE = substr(k.CURS_DATE, 1, 4) AND a.CURR_CODE = k.CURR_CODE\n" +
+                    ") f\n" +
+                    "GROUP BY f.PART_DATE, f.CURR_CODE\n");
+
+            // создать представление, если его нет
+            statement.executeUpdate("CREATE VIEW IF NOT EXISTS CURS_REPORT\n" +
+                    "AS\n" +
+                    "SELECT k.CURS_DATE,\n" +
+                    "       k.CURR_CODE,\n" +
+                    "\t   k.RATE,\n" +
+                    "       a.AVG_RATE/100 as AVG_RATE\n" +
+                    "FROM CURS k\n" +
+                    "INNER JOIN CURS_AVG a ON a.PART_DATE = substr(k.CURS_DATE, 6, 5) AND a.CURR_CODE = k.CURR_CODE\n" +
+                    "WHERE substr(k.CURS_DATE, 1, 4) IN (SELECT substr(MAX(date(kk.CURS_DATE)),1,4) FROM CURS kk)\n" +
+                    "ORDER BY 1");
         }
         catch(SQLException e)
         {
