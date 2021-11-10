@@ -777,10 +777,10 @@ public class curr_chart_Controller {
                     "SELECT k.CURS_DATE,\n" +
                     "       k.CURR_CODE,\n" +
                     "\t   k.RATE,\n" +
-                    "       a.AVG_RATE/100 as AVG_RATE\n" +
+                    "       a.AVG_RATE as AVG_RATE\n" +
                     "FROM CURS k\n" +
                     "INNER JOIN CURS_AVG a ON a.PART_DATE = substr(k.CURS_DATE, 6, 5) AND a.CURR_CODE = k.CURR_CODE\n" +
-                    "WHERE substr(k.CURS_DATE, 1, 4) IN (SELECT substr(MAX(date(kk.CURS_DATE)),1,4) FROM CURS kk)\n" +
+                    "WHERE substr(k.CURS_DATE, 1, 4) IN (SELECT substr(MAX(date(kk.CURS_DATE)),1,4) FROM CURS kk) AND a.AVG_RATE <= 100\n" +
                     "ORDER BY 1");
         }
         catch(SQLException e)
