@@ -28,6 +28,7 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    // Преобразование текста в число
     static float getString_Float(String string)
     {
         String string_new  = string.replace(",", ".");
@@ -68,16 +69,22 @@ public class Main extends Application {
     // вывод диалогового окна - Да/Нет
     static boolean MessageBoxYesNo(String infoMessage, String infoHeader)
     {
-        //alert.showAndWait();
         Alert alert = new Alert(Alert.AlertType.WARNING, "", ButtonType.YES, ButtonType.NO);
         alert.setTitle("Предупреждение:");
         alert.setHeaderText(infoHeader);
         alert.setContentText(infoMessage);
         Optional<ButtonType> result = alert.showAndWait();
-
-        if (result.get() == ButtonType.YES) {
-            return true;
-        }
-        return false;
+        return result.get() == ButtonType.YES;
     }
+
+    // вывод диалогового окна - Да/Нет
+    static void MessageBoxWarn(String infoMessage, String infoHeader)
+    {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Предупреждение:");
+        alert.setHeaderText(infoHeader);
+        alert.setContentText(infoMessage);
+        alert.showAndWait();
+    }
+
 }

@@ -25,13 +25,24 @@ import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 
 public class curr_chart_Controller {
 
@@ -45,7 +56,7 @@ public class curr_chart_Controller {
                                                                                     "31");
     private final ObservableList<String> source_code_List = FXCollections.observableArrayList("Из файла JSON", "С сайта НБУ");
     private static final String tec_kat = new File("").getAbsolutePath();
-    private static final String tec_kat_curs = tec_kat + /*File.separator + "dist" +*/ File.separator + "temp";
+    private static final String tec_kat_curs = tec_kat + File.separator + "temp";
 
     @FXML private ComboBox<String> curr_code;
     @FXML private ComboBox<String> year_com;
@@ -109,6 +120,10 @@ public class curr_chart_Controller {
         not_create_cache_file.setDisable(true);
         not_create_cache_file.setSelected(false);
 
+        // Создание базы данных SQLite и создание таблицы для добавления данных
+        CreateTableSQLite();
+
+        // Заполенение и прорисовка графика
         Calc_range();
     }
 
@@ -118,6 +133,45 @@ public class curr_chart_Controller {
         // Обновить график
         // расчет диапазонов и вывод данных
         Calc_range();
+    }
+
+    // кнопка - Обновить график
+    @FXML
+    private void Report_buttonActionPerformed() throws JRException, IOException {
+        // Генерация отчета
+        String file_name = "StyledTextReport";
+        String mPath_sample = tec_kat + File.separator + "report_sample";
+        String mPath_export = tec_kat + File.separator + "report_export";
+
+        // Компиляция jrxml файла
+        JasperReport jasperReport = JasperCompileManager
+                .compileReport(mPath_sample + File.separator + file_name + ".jrxml");
+
+        // Параметры для отчета
+        Map<String, Object> parameters = new HashMap<>();
+
+        // DataSource - без базы данных. Используется пустой источник данных.
+        JRDataSource dataSource = new JREmptyDataSource();
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+        // Проверка папки для экспорта
+        boolean mkdirs_result = new File(mPath_export).mkdirs();
+        if (!mkdirs_result) {
+            System.out.println(mPath_export + " Каталог уже существует");
+        }
+
+        // Экспорт в PDF
+        JasperExportManager.exportReportToPdfFile(jasperPrint,
+                mPath_export + File.separator + file_name + ".pdf");
+
+        // Отобразить файл на экране
+        File file = new File(mPath_export + File.separator + file_name + ".pdf");
+        if (file.toString().endsWith(".pdf"))
+            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
+        else {
+            Desktop desktop = Desktop.getDesktop();
+            desktop.open(file);
+        }
     }
 
     // кнопка - Ссылка на курсы НБУ
@@ -147,6 +201,7 @@ public class curr_chart_Controller {
         }
     }
 
+    // Расчет значений графика и его прорисовка
     private void Calc_range() throws TransformerException {
         Calendar now = Calendar.getInstance();   // Gets the current date and time
         int year = now.get(Calendar.YEAR);       // The current year        
@@ -211,8 +266,27 @@ public class curr_chart_Controller {
         // добавляем в панель - график
         String mCurrCode = curr_code.getSelectionModel().getSelectedItem().substring(0, 3);
         String[][] mArray = null;
-
         int source_index = source_code.getSelectionModel().getSelectedIndex();
+
+        if (source_index == 0) {
+            // проверка на существования графика в json
+            String mPath = tec_kat_curs + File.separator + mCurrCode;
+            if (!new File(mPath).mkdirs()) {
+                // ищем файлы с расширением json
+                File dir = new File(mPath);
+                File[] matchingFiles = dir.listFiles((dir1, name) -> name.endsWith("json"));
+                assert matchingFiles != null;
+                if (matchingFiles.length == 0) {
+                    source_code.getSelectionModel().select(1); // второе значение
+                    Main.MessageBoxWarn(mPath, "Переключено на получение данных с сайта НБУ.\nНе найден файл *.json в каталоге - загрузить с https://bank.gov.ua/control/uk/curmetal/currency/search/form/period");
+                }
+            } else {
+                source_code.getSelectionModel().select(1); // второе значение
+                Main.MessageBoxWarn(mPath, "Переключено на получение данных с сайта НБУ.\nНе найден файл *.json в каталоге - загрузить с https://bank.gov.ua/control/uk/curmetal/currency/search/form/period");
+            }
+        }
+
+        source_index = source_code.getSelectionModel().getSelectedIndex();
         if (source_index == 0) {
             mArray = getCursNbu(mCurrCode, mDate1, mDate2);
         } else if (source_index == 1) {
@@ -229,9 +303,14 @@ public class curr_chart_Controller {
 
         // рисуем график
         LineChartGraphic(mArray, m_is_average_value_curr, m_is_visible_points);
+
+        // Добавление данных в базу SQLite
+        assert mArray != null;
+        AddTableSQLite(mCurrCode, mArray);
+
     }
 
-    // Получить курс НБУ
+    // Получить курс НБУ (С сайта JSON)
     private String [][] getCursNbu(String mCurrCode, LocalDate [] mDate1, LocalDate [] mDate2)
     {
         String mPath = tec_kat_curs + File.separator + mCurrCode;
@@ -332,7 +411,7 @@ public class curr_chart_Controller {
         return mArray;
     }
 
-    // Получить курс НБУ (Онлайн)
+    // Получить курс НБУ (Онлайн XML)
     private String [][] getCursNbu_WEB(String mCurrCode, LocalDate [] mDate1, LocalDate [] mDate2) throws TransformerException {
         String mPath = tec_kat_curs + File.separator + mCurrCode;
         File file;
@@ -494,6 +573,7 @@ public class curr_chart_Controller {
         return mArray;
     }
 
+    // Прорисовка графика
     private void LineChartGraphic(String [][] mArray, int is_average_value_curr, int is_visible_points) {
         if (mArray == null) { return; }
 
@@ -618,11 +698,12 @@ public class curr_chart_Controller {
         }
     }
 
-    public boolean isDateValid(String m_date)
+    // Валидация даты
+    public boolean isDateValid(String m_date, String format)
     {
         if (m_date.isEmpty()) { return false; }
         try {
-            DateTimeFormatter f = DateTimeFormatter.ofPattern ( "dd.MM.yyyy" );
+            DateTimeFormatter f = DateTimeFormatter.ofPattern ( format );
             LocalDate.parse ( m_date , f );
             return true;
         } catch (Exception e) {
@@ -630,11 +711,98 @@ public class curr_chart_Controller {
         }
     }
 
+    // Преобразование текста в дату
+    public LocalDate getDateString(String m_date, String format)
+    {
+        if (!isDateValid(m_date, format)) { return null; }
+        DateTimeFormatter f = DateTimeFormatter.ofPattern ( format );
+        return LocalDate.parse ( m_date , f );
+    }
+
+    // Преобразование текста в дату
     public LocalDate getDateString(String m_date)
     {
-        if (!isDateValid(m_date)) { return null; }
-        DateTimeFormatter f = DateTimeFormatter.ofPattern ( "dd.MM.yyyy" );
-        return LocalDate.parse ( m_date , f );
+        return getDateString(m_date, "dd.MM.yyyy");
+    }
+
+    // Создание базы данных SQLite и создание таблицы для добавления данных
+    public void CreateTableSQLite()
+    {
+        Connection connection = null;
+        try
+        {
+            // create a database connection
+            connection = DriverManager.getConnection("jdbc:sqlite:CurrencyChartFXMaven.db");
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);  // set timeout to 30 sec.
+            // создать таблицу, если её нет
+            statement.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS CURS " +
+                            "( ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," +
+                              "CURS_DATE TEXT NOT NULL," +
+                              "CURR_CODE TEXT NOT NULL," +
+                              "RATE REAL NOT NULL CHECK(RATE > 0)" +
+                            ");");
+
+            // создать индекс, если его нет
+            statement.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS UK_CURS ON CURS (CURS_DATE, CURR_CODE);");
+        }
+        catch(SQLException e)
+        {
+            Main.MessageBoxError(e.getMessage(), "Ошибка CreateTableSQLite");
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null)
+                    connection.close();
+            }
+            catch(SQLException e)
+            {
+                // connection close failed.
+                Main.MessageBoxError(e.getMessage(), "Ошибка CreateTableSQLite");
+            }
+        }
+    }
+
+    // Добавление данных в базу SQLite
+    // SELECT * from CURS k where date(k.curs_date) between date('2021-11-07') and date('2021-11-10')
+    public void AddTableSQLite(String mCurrCode, String[][] mArray)
+    {
+        Connection connection = null;
+        try {
+            // create a database connection
+            connection = DriverManager.getConnection("jdbc:sqlite:CurrencyChartFXMaven.db");
+            for (int iii = 0; iii < mArray[0].length; iii++) {
+                String INSERT_SQL = "INSERT OR IGNORE INTO CURS(curs_date, curr_code, rate) VALUES(?, ?, ?);";
+                PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
+                ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
+                                                mArray[0][iii].substring(4, 6) + "-" +
+                                                mArray[0][iii].substring(6, 8) + " 00:00:00"
+                                                ); // TEXT как строки ISO8601 ("YYYY-MM-DD HH:MM:SS").
+                ps.setString(2, mCurrCode);
+                ps.setFloat(3, Main.getString_Float(mArray[1][iii]));
+                ps.executeUpdate();
+            }
+        }
+        catch(SQLException e)
+        {
+            Main.MessageBoxError(e.getMessage(), "Ошибка AddTableSQLite");
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null)
+                    connection.close();
+            }
+            catch(SQLException e)
+            {
+                // connection close failed.
+                Main.MessageBoxError(e.getMessage(), "Ошибка AddTableSQLite");
+            }
+        }
     }
 
 }

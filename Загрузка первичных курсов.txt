@@ -1,2 +1,0 @@
-https://bank.gov.ua/control/uk/curmetal/currency/search/form/period
-Указать период и экспорт JSON
