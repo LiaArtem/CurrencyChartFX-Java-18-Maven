@@ -29,24 +29,24 @@ public class Main extends Application {
     }
 
     // Преобразование текста в число
-    static float getString_Float(String string)
+    static double getString_Double(String string)
     {
         String string_new  = string.replace(",", ".");
         if (string_new.isEmpty()) { return 0; }
         try {
-            return Float.parseFloat(string_new);
+            return Double.parseDouble(string_new);
         } catch (Exception e) {
             return 0;
         }
     }
 
-    // проверка значения - float
-    public static boolean checkString_Float(String string)
+    // проверка значения - Double
+    public static boolean checkString_Double(String string)
     {
         String string_new  = string.replace(",", ".");
         if (!string_new.isEmpty()) {
             try {
-                Float.parseFloat(string_new);
+                Double.parseDouble(string_new);
             } catch (NumberFormatException e) {
                 return false;
             }

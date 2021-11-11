@@ -25,7 +25,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
@@ -135,7 +134,7 @@ public class curr_chart_Controller {
         Calc_range();
     }
 
-    // кнопка - Обновить график
+    // кнопка - Report
     @FXML
     private void Report_buttonActionPerformed() throws JRException, IOException {
         // Генерация отчета
@@ -153,6 +152,44 @@ public class curr_chart_Controller {
         // DataSource - без базы данных. Используется пустой источник данных.
         JRDataSource dataSource = new JREmptyDataSource();
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+        // Проверка папки для экспорта
+        boolean mkdirs_result = new File(mPath_export).mkdirs();
+        if (!mkdirs_result) {
+            System.out.println(mPath_export + " Каталог уже существует");
+        }
+
+        // Экспорт в PDF
+        JasperExportManager.exportReportToPdfFile(jasperPrint,
+                mPath_export + File.separator + file_name + ".pdf");
+
+        // Отобразить файл на экране
+        File file = new File(mPath_export + File.separator + file_name + ".pdf");
+        if (file.toString().endsWith(".pdf"))
+            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
+        else {
+            Desktop desktop = Desktop.getDesktop();
+            desktop.open(file);
+        }
+    }
+
+    // кнопка - ReportDB
+    @FXML
+    private void Report_buttonDBActionPerformed() throws JRException, IOException {
+        // Генерация отчета
+        String file_name = "CurrencyChartFXMavenReport";
+        String mPath_sample = tec_kat + File.separator + "report_sample";
+        String mPath_export = tec_kat + File.separator + "report_export";
+
+        // Компиляция jrxml файла
+        JasperReport jasperReport = JasperCompileManager
+                .compileReport(mPath_sample + File.separator + file_name + ".jrxml");
+
+        // Параметры для отчета
+        Map<String, Object> parameters = new HashMap<>();
+
+        // DataSource - SQLite
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionSQLite());
 
         // Проверка папки для экспорта
         boolean mkdirs_result = new File(mPath_export).mkdirs();
@@ -207,7 +244,7 @@ public class curr_chart_Controller {
         int year = now.get(Calendar.YEAR);       // The current year        
         int year_now = year;
         // расчитываем диапазон
-        int mYear = (int) Main.getString_Float(minus_year.getText()) + 1;
+        int mYear = (int) Main.getString_Double(minus_year.getText()) + 1;
         int m_is_average_value_curr;
         int m_is_visible_points;
 
@@ -222,7 +259,7 @@ public class curr_chart_Controller {
             if (check_day.isSelected()) {
 
                 int mMonthS = month_com.getSelectionModel().getSelectedIndex() + 1;
-                int mDay = (int) Main.getString_Float(plus_day.getText()) + (int) Main.getString_Float(minus_day.getText()) + 1;
+                int mDay = (int) Main.getString_Double(plus_day.getText()) + (int) Main.getString_Double(minus_day.getText()) + 1;
                 int mDayS = day_com.getSelectionModel().getSelectedIndex();
 
                 // стартовая дата        
@@ -232,8 +269,8 @@ public class curr_chart_Controller {
                     mDate1[i] = mDate1[i].plusDays(mDayS);
                 }
                 // минус дней
-                if ((int) Main.getString_Float(minus_day.getText()) > 0) {
-                    mDate1[i] = mDate1[i].minusDays((int) Main.getString_Float(minus_day.getText()));
+                if ((int) Main.getString_Double(minus_day.getText()) > 0) {
+                    mDate1[i] = mDate1[i].minusDays((int) Main.getString_Double(minus_day.getText()));
                 }
                 // плюс необходимое кол-во дней
                 mDate2[i] = mDate1[i].plusDays(mDay);
@@ -241,8 +278,8 @@ public class curr_chart_Controller {
             // месяц
             else if (check_month.isSelected()) {
 
-                int mMonth = (int) Main.getString_Float(plus_month.getText()) + (int) Main.getString_Float(minus_month.getText()) + 1;
-                int mMonthS = month_com.getSelectionModel().getSelectedIndex() - (int) Main.getString_Float(minus_month.getText()) + 1;
+                int mMonth = (int) Main.getString_Double(plus_month.getText()) + (int) Main.getString_Double(minus_month.getText()) + 1;
+                int mMonthS = month_com.getSelectionModel().getSelectedIndex() - (int) Main.getString_Double(minus_month.getText()) + 1;
                 if (mMonthS < 0) {
                     mMonthS = 12 + mMonthS;
                     if (i == 0) { year = year - 1; }
@@ -513,16 +550,16 @@ public class curr_chart_Controller {
                     LocalDate m_date = getDateString(date_text);
                     int kol_day = Period.between(mDate1[0], m_date).getDays();
                     // если в начале не хватает курсов дополняем
+                    double curs_rate = Double.parseDouble(curs_text) / Double.parseDouble(rate_text);
                     if (s == 0 && kol_day > 0) {
                         LocalDate m_date_temp = mDate1[0];
                         for (int k = 0; k < kol_day; k++) {
                             listDate.add(m_date_temp.format(DateTimeFormatter.ofPattern ( "dd.MM.yyyy" )));      // дата
-                            listCurs.add((double) Float.parseFloat(curs_text) / Float.parseFloat(rate_text));
+                            listCurs.add(curs_rate);
                             m_date_temp = m_date_temp.plusDays(1);
                         }
                     }
                     // восстанавливаем курсы если есть пустые участки
-                    float curr_value = Float.parseFloat(curs_text) / Float.parseFloat(rate_text);
                     if (s > 0) {
                         assert m_date_old != null;
                         kol_day = Period.between(m_date_old, m_date).getDays();
@@ -531,13 +568,13 @@ public class curr_chart_Controller {
                             for (int k = 0; k < kol_day - 1; k++) {
                                 m_date_temp = m_date_temp.plusDays(1);
                                 listDate.add(m_date_temp.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));      // дата
-                                listCurs.add((double) curr_value);
+                                listCurs.add(curs_rate);
                             }
                         }
                     }
 
                     listDate.add(date_text);      // дата
-                    listCurs.add((double) curr_value);
+                    listCurs.add(curs_rate);
                     m_date_old = m_date;
                 }
             }
@@ -588,13 +625,13 @@ public class curr_chart_Controller {
         XYChart.Series<String, Number> series1 = new XYChart.Series<>();
         series1.setName(Integer.toString(m_year_temp));
 
-        float [][] mArray_average = new float [1][1];
-        float m_average_value = 0;
+        double [][] mArray_average = new double [1][1];
+        double m_average_value = 0;
         if (is_average_value_curr == 1) {
             // определяем сколько годов
             int m_average_num;
             int m_kol_year = Integer.parseInt(mArray[0][mArray[0].length - 1].substring(0, 4)) - Integer.parseInt(mArray[0][0].substring(0, 4)) + 1;
-            mArray_average = new float [2][m_kol_year];
+            mArray_average = new double [2][m_kol_year];
             int m_base_year = Integer.parseInt(mArray[0][0].substring(0, 4));
             // идем по годам
             for (int ii = 0; ii < m_kol_year; ii++) {
@@ -604,7 +641,7 @@ public class curr_chart_Controller {
                 for (int iii = 0; iii < mArray[0].length; iii++) {
                     if (mArray[1][iii] != null) {
                         if (Integer.toString(m_base_year).equals(mArray[0][iii].substring(0, 4))) {
-                            m_average_value += Float.parseFloat(mArray[1][iii].replace(",", "."));
+                            m_average_value += Double.parseDouble(mArray[1][iii].replace(",", "."));
                             m_average_num++;
                         }
                     }
@@ -619,7 +656,7 @@ public class curr_chart_Controller {
             }
         }
 
-        float m_base_min = 0, m_base_max = 0, m_base_init = 0;
+        double m_base_min = 0, m_base_max = 0, m_base_init = 0;
         for (int ii = 0; ii < mArray[0].length; ii++)
         {
             m_year_temp = Integer.parseInt(mArray[0][ii].substring(0, 4));
@@ -646,7 +683,7 @@ public class curr_chart_Controller {
                 }
 
                 String ValueDate = m_day + "." + m_months;
-                float FloatData = Float.parseFloat(mArray[1][ii].replace(",", "."));
+                double DoubleData = Double.parseDouble(mArray[1][ii].replace(",", "."));
 
                 if (is_average_value_curr == 1) {
                     for (int iii = 0; iii < mArray_average[0].length; iii++) {
@@ -654,15 +691,15 @@ public class curr_chart_Controller {
                             m_average_value = mArray_average[1][iii];
                         }
                     }
-                    series1.getData().add(new XYChart.Data<>(ValueDate, FloatData / m_average_value));
+                    series1.getData().add(new XYChart.Data<>(ValueDate, DoubleData / m_average_value));
                 }
                 else {
-                    series1.getData().add(new XYChart.Data<>(ValueDate, FloatData));
+                    series1.getData().add(new XYChart.Data<>(ValueDate, DoubleData));
                 }
 
                 // поиск мин. и макс. значения
-                float m_value_data = FloatData;
-                if (is_average_value_curr == 1) m_value_data = FloatData / m_average_value;
+                double m_value_data = DoubleData;
+                if (is_average_value_curr == 1) m_value_data = DoubleData / m_average_value;
                 if (m_base_init == 0) {
                     m_base_min = m_value_data;
                     m_base_max = m_value_data;
@@ -725,6 +762,22 @@ public class curr_chart_Controller {
         return getDateString(m_date, "dd.MM.yyyy");
     }
 
+    // Подключение к DB и создание базы данных SQLite
+    public Connection ConnectionSQLite()
+    {
+        Connection connection = null;
+        try
+        {
+            // create a database connection
+            connection = DriverManager.getConnection("jdbc:sqlite:CurrencyChartFXMaven.db");
+        }
+        catch(SQLException e)
+        {
+            Main.MessageBoxError(e.getMessage(), "Ошибка ConnectionSQLite");
+        }
+        return connection;
+    }
+
     // Создание базы данных SQLite и создание таблицы для добавления данных
     public void CreateTableSQLite()
     {
@@ -732,7 +785,7 @@ public class curr_chart_Controller {
         try
         {
             // create a database connection
-            connection = DriverManager.getConnection("jdbc:sqlite:CurrencyChartFXMaven.db");
+            connection = ConnectionSQLite();
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
             // создать таблицу, если её нет
@@ -818,7 +871,7 @@ public class curr_chart_Controller {
                                                 mArray[0][iii].substring(6, 8) + " 00:00:00"
                                                 ); // TEXT как строки ISO8601 ("YYYY-MM-DD HH:MM:SS").
                 ps.setString(2, mCurrCode);
-                ps.setFloat(3, Main.getString_Float(mArray[1][iii]));
+                ps.setDouble(3, Main.getString_Double(mArray[1][iii]));
                 ps.executeUpdate();
             }
         }

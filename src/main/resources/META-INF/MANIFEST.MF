@@ -1,14 +1,15 @@
 Manifest-Version: 1.0
 Main-Class: com.example.currencychartfxmaven.Main
-Class-Path: castor-core-1.4.1.jar javafx-graphics-17.0.0.1-win.jar javaf
- x-controls-17.0.0.1.jar commons-collections-3.2.2.jar commons-logging-1
- .1.1.jar bcprov-jdk15on-1.68.jar jackson-annotations-2.12.2.jar javafx-
- fxml-17.0.0.1.jar javax.activation-api-1.2.0.jar javafx-base-17.0.0.1-w
- in.jar commons-lang3-3.4.jar jfreechart-1.0.19.jar jaxb-api-2.3.1.jar c
- astor-xml-1.4.1.jar commons-digester-2.1.jar jasperreports-6.18.1.jar s
- qlite-jdbc-3.36.0.2.jar javax.inject-1.jar javafx-graphics-17.0.0.1.jar
-  javafx-controls-17.0.0.1-win.jar itext-2.1.7.js9.jar commons-collectio
- ns4-4.2.jar jackson-databind-2.12.2.jar commons-beanutils-1.9.4.jar jco
- mmon-1.0.23.jar jackson-core-2.12.2.jar gson-2.8.5.jar javafx-fxml-17.0
- .0.1-win.jar ecj-3.21.0.jar javafx-base-17.0.0.1.jar
+Class-Path: javafx-controls-17.0.0.1.jar commons-beanutils-1.9.4.jar jav
+ afx-controls-17.0.0.1-win.jar javafx-base-17.0.0.1-win.jar castor-core-
+ 1.4.1.jar javax.activation-api-1.2.0.jar commons-collections4-4.2.jar j
+ common-1.0.23.jar jfreechart-1.0.19.jar bcprov-jdk15on-1.68.jar jasperr
+ eports-fonts-6.18.1.jar commons-collections-3.2.2.jar itext-2.1.7.js9.j
+ ar javax.inject-1.jar castor-xml-1.4.1.jar commons-lang3-3.4.jar sqlite
+ -jdbc-3.36.0.2.jar ecj-3.21.0.jar jaxb-api-2.3.1.jar javafx-graphics-17
+ .0.0.1-win.jar javafx-fxml-17.0.0.1-win.jar commons-logging-1.1.1.jar j
+ ackson-core-2.12.2.jar javafx-graphics-17.0.0.1.jar jackson-annotations
+ -2.12.2.jar javafx-fxml-17.0.0.1.jar jackson-databind-2.12.2.jar gson-2
+ .8.5.jar commons-digester-2.1.jar javafx-base-17.0.0.1.jar jasperreport
+ s-6.18.1.jar
 

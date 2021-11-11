@@ -77,7 +77,8 @@
             </ComboBox>
             <CheckBox fx:id="del_cache_file" mnemonicParsing="false" prefHeight="17.0" prefWidth="223.0" selected="true" text="Удалить Кеш файл" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
             <CheckBox fx:id="not_create_cache_file" mnemonicParsing="false" prefHeight="17.0" prefWidth="223.0" selected="true" text="Не создавать Кеш файл" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
-            <Button fx:id="Report_button" mnemonicParsing="false" onAction="#Report_buttonActionPerformed" prefHeight="25.0" prefWidth="79.0" text="Report" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+            <Button fx:id="Report_button" mnemonicParsing="false" onAction="#Report_buttonActionPerformed" prefHeight="25.0" prefWidth="79.0" text="Report" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+            <Button fx:id="Report_buttonDB" mnemonicParsing="false" onAction="#Report_buttonDBActionPerformed" prefHeight="25.0" prefWidth="79.0" text="ReportDB" GridPane.columnIndex="7" GridPane.rowIndex="3" />
          </children>
          <BorderPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
