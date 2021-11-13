@@ -211,6 +211,44 @@ public class curr_chart_Controller {
         }
     }
 
+    // кнопка - ReportDB2
+    @FXML
+    private void Report_buttonDB2ActionPerformed() throws JRException, IOException {
+        // Генерация отчета
+        String file_name = "CurrencyChartFXMavenReportMySQL";
+        String mPath_sample = tec_kat + File.separator + "report_sample";
+        String mPath_export = tec_kat + File.separator + "report_export";
+
+        // Компиляция jrxml файла
+        JasperReport jasperReport = JasperCompileManager
+                .compileReport(mPath_sample + File.separator + file_name + ".jrxml");
+
+        // Параметры для отчета
+        Map<String, Object> parameters = new HashMap<>();
+
+        // DataSource - SQLite
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionMySQL());
+
+        // Проверка папки для экспорта
+        boolean mkdirs_result = new File(mPath_export).mkdirs();
+        if (!mkdirs_result) {
+            System.out.println(mPath_export + " Каталог уже существует");
+        }
+
+        // Экспорт в PDF
+        JasperExportManager.exportReportToPdfFile(jasperPrint,
+                mPath_export + File.separator + file_name + ".pdf");
+
+        // Отобразить файл на экране
+        File file = new File(mPath_export + File.separator + file_name + ".pdf");
+        if (file.toString().endsWith(".pdf"))
+            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
+        else {
+            Desktop desktop = Desktop.getDesktop();
+            desktop.open(file);
+        }
+    }
+
     // кнопка - Ссылка на курсы НБУ
     @FXML
     private void button_curs_nbuActionPerformed() {
@@ -345,6 +383,8 @@ public class curr_chart_Controller {
         assert mArray != null;
         AddTableSQLite(mCurrCode, mArray);
 
+        // Добавление данных в базу DB MySQL
+        AddTableMySQL(mCurrCode, mArray);
     }
 
     // Получить курс НБУ (С сайта JSON)
@@ -862,7 +902,7 @@ public class curr_chart_Controller {
         Connection connection = null;
         try {
             // create a database connection
-            connection = DriverManager.getConnection("jdbc:sqlite:CurrencyChartFXMaven.db");
+            connection = ConnectionSQLite();
             for (int iii = 0; iii < mArray[0].length; iii++) {
                 String INSERT_SQL = "INSERT OR IGNORE INTO CURS(curs_date, curr_code, rate) VALUES(?, ?, ?);";
                 PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
@@ -890,6 +930,65 @@ public class curr_chart_Controller {
             {
                 // connection close failed.
                 Main.MessageBoxError(e.getMessage(), "Ошибка AddTableSQLite");
+            }
+        }
+    }
+
+    // Подключение к DB MySQL
+    public Connection ConnectionMySQL()
+    {
+        Connection connection = null;
+        try
+        {
+            // create a database connection
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test_schemas", "test_user", "12345678");
+        }
+        catch(SQLException e)
+        {
+            connection = null;
+        }
+        return connection;
+    }
+
+    // Добавление данных в базу MySQL
+    public void AddTableMySQL(String mCurrCode, String[][] mArray)
+    {
+        Connection connection = null;
+        try {
+            // create a database connection
+            connection = ConnectionMySQL();
+            if (connection == null) { return; }
+
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            for (int iii = 0; iii < mArray[0].length; iii++) {
+                String INSERT_SQL = "CALL `test_schemas`.`INSERT_CURS`(?, ?, ?);";
+                PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
+                ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
+                        mArray[0][iii].substring(4, 6) + "-" +
+                        mArray[0][iii].substring(6, 8) + " 00:00:00"
+                ); // TEXT как строки ISO8601 ("YYYY-MM-DD HH:MM:SS").
+                ps.setString(2, mCurrCode);
+                ps.setDouble(3, Main.getString_Double(mArray[1][iii]));
+                ps.executeUpdate();
+            }
+        }
+        catch(SQLException e)
+        {
+            Main.MessageBoxError(e.getMessage(), "Ошибка AddTableMySQL");
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null)
+                    connection.close();
+            }
+            catch(SQLException e)
+            {
+                // connection close failed.
+                Main.MessageBoxError(e.getMessage(), "Ошибка AddTableMySQL");
             }
         }
     }
