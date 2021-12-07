@@ -32,3 +32,5 @@ Exception in thread "main" java.lang.SecurityException: Invalid signature file d
 - IntelliJ IDEA -> File -> Project Structure -> Add New (Artifacts) -> jar -> From Modules With Dependencies on the Create Jar From Module Window:
 - Select you main class
 - JAR File from Libraries Select copy to the output directory and link via manifest
+
+!!! Для JAR удалять Artifacts и создавать заново при добавлении новых в maven (IntelliJ IDEA -> File -> Project Structure -> Add New (Artifacts) -> jar).

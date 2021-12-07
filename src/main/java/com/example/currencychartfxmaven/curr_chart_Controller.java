@@ -134,7 +134,7 @@ public class curr_chart_Controller {
         Calc_range();
     }
 
-    // кнопка - Report
+    // кнопка - Report - No DB
     @FXML
     private void Report_buttonActionPerformed() throws JRException, IOException {
         // Генерация отчета
@@ -173,7 +173,7 @@ public class curr_chart_Controller {
         }
     }
 
-    // кнопка - ReportDB
+    // кнопка - ReportDB - DB SQLite
     @FXML
     private void Report_buttonDBActionPerformed() throws JRException, IOException {
         // Генерация отчета
@@ -188,7 +188,7 @@ public class curr_chart_Controller {
         // Параметры для отчета
         Map<String, Object> parameters = new HashMap<>();
 
-        // DataSource - SQLite
+        // DataSource
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionSQLite());
 
         // Проверка папки для экспорта
@@ -211,7 +211,7 @@ public class curr_chart_Controller {
         }
     }
 
-    // кнопка - ReportDB2
+    // кнопка - ReportDB2 - DB MySQL
     @FXML
     private void Report_buttonDB2ActionPerformed() throws JRException, IOException {
         // Генерация отчета
@@ -226,8 +226,46 @@ public class curr_chart_Controller {
         // Параметры для отчета
         Map<String, Object> parameters = new HashMap<>();
 
-        // DataSource - SQLite
+        // DataSource
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionMySQL());
+
+        // Проверка папки для экспорта
+        boolean mkdirs_result = new File(mPath_export).mkdirs();
+        if (!mkdirs_result) {
+            System.out.println(mPath_export + " Каталог уже существует");
+        }
+
+        // Экспорт в PDF
+        JasperExportManager.exportReportToPdfFile(jasperPrint,
+                mPath_export + File.separator + file_name + ".pdf");
+
+        // Отобразить файл на экране
+        File file = new File(mPath_export + File.separator + file_name + ".pdf");
+        if (file.toString().endsWith(".pdf"))
+            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
+        else {
+            Desktop desktop = Desktop.getDesktop();
+            desktop.open(file);
+        }
+    }
+
+    // кнопка - ReportDB3 - DB PostgreSQL
+    @FXML
+    private void Report_buttonDB3ActionPerformed() throws JRException, IOException {
+        // Генерация отчета
+        String file_name = "CurrencyChartFXMavenReportPostgreSQL";
+        String mPath_sample = tec_kat + File.separator + "report_sample";
+        String mPath_export = tec_kat + File.separator + "report_export";
+
+        // Компиляция jrxml файла
+        JasperReport jasperReport = JasperCompileManager
+                .compileReport(mPath_sample + File.separator + file_name + ".jrxml");
+
+        // Параметры для отчета
+        Map<String, Object> parameters = new HashMap<>();
+
+        // DataSource
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionPostgreSQL());
 
         // Проверка папки для экспорта
         boolean mkdirs_result = new File(mPath_export).mkdirs();
@@ -385,6 +423,9 @@ public class curr_chart_Controller {
 
         // Добавление данных в базу DB MySQL
         AddTableMySQL(mCurrCode, mArray);
+
+        // Добавление данных в базу DB PostgreSQL
+        AddTablePostgreSQL(mCurrCode, mArray);
     }
 
     // Получить курс НБУ (С сайта JSON)
@@ -989,6 +1030,65 @@ public class curr_chart_Controller {
             {
                 // connection close failed.
                 Main.MessageBoxError(e.getMessage(), "Ошибка AddTableMySQL");
+            }
+        }
+    }
+
+    // Подключение к DB PostgreSQL
+    public Connection ConnectionPostgreSQL()
+    {
+        Connection connection = null;
+        try
+        {
+            // create a database connection
+            connection = DriverManager.getConnection("jdbc:postgresql://localhost/test_database", "test_user", "12345678");
+        }
+        catch(SQLException e)
+        {
+            connection = null;
+        }
+        return connection;
+    }
+
+    // Добавление данных в базу PostgreSQL
+    public void AddTablePostgreSQL(String mCurrCode, String[][] mArray)
+    {
+        Connection connection = null;
+        try {
+            // create a database connection
+            connection = ConnectionPostgreSQL();
+            if (connection == null) { return; }
+
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            for (int iii = 0; iii < mArray[0].length; iii++) {
+                String INSERT_SQL = "CALL test_schemas.INSERT_CURS(?, ?, ?)";
+                PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
+                ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
+                        mArray[0][iii].substring(4, 6) + "-" +
+                        mArray[0][iii].substring(6, 8) + " 00:00:00"
+                ); // TEXT как строки ISO8601 ("YYYY-MM-DD HH:MM:SS").
+                ps.setString(2, mCurrCode);
+                ps.setDouble(3, Main.getString_Double(mArray[1][iii]));
+                ps.executeUpdate();
+            }
+        }
+        catch(SQLException e)
+        {
+            Main.MessageBoxError(e.getMessage(), "Ошибка AddTablePostgreSQL");
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null)
+                    connection.close();
+            }
+            catch(SQLException e)
+            {
+                // connection close failed.
+                Main.MessageBoxError(e.getMessage(), "Ошибка AddTablePostgreSQL");
             }
         }
     }
