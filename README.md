@@ -1,6 +1,6 @@
 # CurrencyChartFX-Java-17-Maven
 Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU on years for watching of tendencies of change.
-Java 17, JavaFX, Maven, SQLite, MySQL, JasperReports
+Java 17, JavaFX, Maven, JasperReports with DB MS SQL 2019, Oracle XE 21c, PostgreSQL 14, SQLite, MySQL
 
 Загрузка первичных курсов
 - https://bank.gov.ua/control/uk/curmetal/currency/search/form/period
@@ -14,6 +14,13 @@ Java 17, JavaFX, Maven, SQLite, MySQL, JasperReports
 - скачать и установить TIB_js-studiocomm_6.18.1_windows_x86_64.exe
 - скачать и настроить Maven
 - настроить Github в IntelliJ IDEA Community (Settings - Version Control - Github)
+
+- скачать Download Microsoft JDBC Driver for SQL Server - (sqljdbc_9.4.1.0_rus.zip).
+  - Файл mssql-jdbc_auth-9.4.1.x64.dll скопировать в windows\system32 для подключения в java
+
+  - При разработке отчетов в Jaspersoft® Studio 6.18.1 для MSSQL 2019 возникает ошибка
+    java.lang.UnsatisfiedLinkError: Native Library .\mssql-jdbc_auth-9.4.1.x64.dll already loaded in another classloader) методы лечения в интернете не подошли
+    При выполнении в java не появляется, видимо проблема Jaspersoft® Studio 6.18.1
 
 Настройка JavaFX
 - https://www.jetbrains.com/help/idea/javafx.html#check-plugin

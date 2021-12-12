@@ -33,6 +33,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="Валюта:">
@@ -77,10 +78,27 @@
             </ComboBox>
             <CheckBox fx:id="del_cache_file" mnemonicParsing="false" prefHeight="17.0" prefWidth="223.0" selected="true" text="Удалить Кеш файл" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="3" />
             <CheckBox fx:id="not_create_cache_file" mnemonicParsing="false" prefHeight="17.0" prefWidth="223.0" selected="true" text="Не создавать Кеш файл" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
-            <Button fx:id="Report_button" mnemonicParsing="false" onAction="#Report_buttonActionPerformed" prefHeight="25.0" prefWidth="79.0" text="RepNoDB" GridPane.columnIndex="7" />
-            <Button fx:id="Report_buttonDB" mnemonicParsing="false" onAction="#Report_buttonDBActionPerformed" prefHeight="25.0" prefWidth="79.0" text="RepSQLite" GridPane.columnIndex="7" GridPane.rowIndex="1" />
-            <Button fx:id="Report_buttonDB2" mnemonicParsing="false" onAction="#Report_buttonDB2ActionPerformed" prefHeight="25.0" prefWidth="79.0" text="ReMySQL" GridPane.columnIndex="7" GridPane.rowIndex="2" />
-            <Button fx:id="Report_buttonDB3" mnemonicParsing="false" onAction="#Report_buttonDB3ActionPerformed" prefHeight="25.0" prefWidth="79.0" text="RePostgre" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+            <Button fx:id="Report_button" mnemonicParsing="false" onAction="#Report_buttonActionPerformed" prefHeight="25.0" prefWidth="79.0" text="RepNoDB" GridPane.columnIndex="2" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets bottom="2.0" />
+               </GridPane.margin></Button>
+            <Button fx:id="Report_buttonDB" mnemonicParsing="false" onAction="#Report_buttonDBActionPerformed" prefHeight="25.0" prefWidth="136.0" text="Report SQLite" GridPane.columnIndex="4" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets bottom="2.0" />
+               </GridPane.margin></Button>
+            <Button fx:id="Report_buttonDB2" mnemonicParsing="false" onAction="#Report_buttonDB2ActionPerformed" prefHeight="25.0" prefWidth="79.0" text="RepMySQL" GridPane.columnIndex="5" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets bottom="2.0" />
+               </GridPane.margin></Button>
+            <Button fx:id="Report_buttonDB3" mnemonicParsing="false" onAction="#Report_buttonDB3ActionPerformed" prefHeight="25.0" prefWidth="130.0" text="Report PostgreSQL" GridPane.columnIndex="6" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets bottom="2.0" />
+               </GridPane.margin></Button>
+            <Button fx:id="Report_buttonDB4" mnemonicParsing="false" onAction="#Report_buttonDB4ActionPerformed" prefHeight="25.0" prefWidth="79.0" text="RepOracle" GridPane.columnIndex="7" GridPane.rowIndex="4">
+               <GridPane.margin>
+                  <Insets bottom="2.0" />
+               </GridPane.margin></Button>
+            <Button fx:id="Report_buttonDB5" mnemonicParsing="false" onAction="#Report_buttonDB5ActionPerformed" prefHeight="25.0" prefWidth="79.0" text="RepMSSQL" GridPane.columnIndex="3" GridPane.rowIndex="4" />
          </children>
          <BorderPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
