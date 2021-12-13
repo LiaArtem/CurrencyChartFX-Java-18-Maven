@@ -1,6 +1,7 @@
 # CurrencyChartFX-Java-17-Maven
+
 Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU on years for watching of tendencies of change.
-Java 17, JavaFX, Maven, JasperReports with DB MS SQL 2019, Oracle XE 21c, PostgreSQL 14, SQLite, MySQL
+- Java 17, JavaFX, Maven, JasperReports, JDBC (MS SQL 2019, Oracle XE 21c, PostgreSQL 14, SQLite, MySQL).
 
 Загрузка первичных курсов
 - https://bank.gov.ua/control/uk/curmetal/currency/search/form/period
