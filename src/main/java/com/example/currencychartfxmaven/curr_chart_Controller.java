@@ -1,6 +1,7 @@
 package com.example.currencychartfxmaven;
 
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -188,8 +189,14 @@ public class curr_chart_Controller {
         // Параметры для отчета
         Map<String, Object> parameters = new HashMap<>();
 
+        Connection connection = ConnectionSQLite();
+        if (connection == null) {
+            Main.MessageBoxError("Ошибка подключения к DB", "Ошибка ConnectionSQLite");
+            return;
+        }
+
         // DataSource
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionSQLite());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
         // Проверка папки для экспорта
         boolean mkdirs_result = new File(mPath_export).mkdirs();
@@ -226,8 +233,14 @@ public class curr_chart_Controller {
         // Параметры для отчета
         Map<String, Object> parameters = new HashMap<>();
 
+        Connection connection = ConnectionMySQL();
+        if (connection == null) {
+            Main.MessageBoxError("Ошибка подключения к DB", "Ошибка ConnectionMySQL");
+            return;
+        }
+
         // DataSource
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionMySQL());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
         // Проверка папки для экспорта
         boolean mkdirs_result = new File(mPath_export).mkdirs();
@@ -264,8 +277,14 @@ public class curr_chart_Controller {
         // Параметры для отчета
         Map<String, Object> parameters = new HashMap<>();
 
+        Connection connection = ConnectionPostgreSQL();
+        if (connection == null) {
+            Main.MessageBoxError("Ошибка подключения к DB", "Ошибка ConnectionPostgreSQL");
+            return;
+        }
+
         // DataSource
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionPostgreSQL());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
         // Проверка папки для экспорта
         boolean mkdirs_result = new File(mPath_export).mkdirs();
@@ -302,8 +321,14 @@ public class curr_chart_Controller {
         // Параметры для отчета
         Map<String, Object> parameters = new HashMap<>();
 
+        Connection connection = ConnectionOracle();
+        if (connection == null) {
+            Main.MessageBoxError("Ошибка подключения к DB", "Ошибка ConnectionOracle");
+            return;
+        }
+
         // DataSource
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionOracle());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
         // Проверка папки для экспорта
         boolean mkdirs_result = new File(mPath_export).mkdirs();
@@ -340,8 +365,14 @@ public class curr_chart_Controller {
         // Параметры для отчета
         Map<String, Object> parameters = new HashMap<>();
 
+        Connection connection = ConnectionMSSQL();
+        if (connection == null) {
+            Main.MessageBoxError("Ошибка подключения к DB", "Ошибка ConnectionMSSQL");
+            return;
+        }
+
         // DataSource
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, ConnectionMSSQL());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
 
         // Проверка папки для экспорта
         boolean mkdirs_result = new File(mPath_export).mkdirs();
@@ -926,14 +957,93 @@ public class curr_chart_Controller {
         return getDateString(m_date, "dd.MM.yyyy");
     }
 
+    public class ConnectionFileDataDB
+    {
+        private String JDBCConnection;
+        private String DBUser;
+        private String DBPassword;
+        private String DBInsertSchema;
+        private String DBInsertProcedure;
+        private boolean Rezult;
+
+        public ConnectionFileDataDB(String typeDB) {
+
+            // Получить параметры
+            String mPath = tec_kat + File.separatorChar + "DBConnSettings.json";
+            File file = new File(mPath);
+            if (!file.exists()) {
+                Rezult = false; // не успешно
+                System.out.println(mPath + " Тип " + typeDB + " Файл не найден, Запись в DB невозможна");
+                return;
+            }
+
+            if (file.isFile()) {
+                try {
+                    JsonReader reader = new JsonReader(new FileReader(file.getPath()));
+                    reader.beginObject();
+                    while(reader.hasNext()){
+                        String name = reader.nextName();
+                        if (name.equals("Connection" + typeDB)) {
+                            reader.beginObject();
+                            while (reader.hasNext()) {
+                                name = reader.nextName();
+                                if (name.equals("JDBCConnection")) {
+                                    JDBCConnection = reader.nextString();
+                                } else if (name.equals("DBUser")) {
+                                    DBUser = reader.nextString();
+                                } else if (name.equals("DBPassword")) {
+                                    DBPassword = reader.nextString();
+                                } else if (name.equals("DBInsertSchema")) {
+                                    DBInsertSchema = reader.nextString();
+                                } else if (name.equals("DBInsertProcedure")) {
+                                    DBInsertProcedure = reader.nextString();
+                                } else {
+                                    reader.skipValue();
+                                }
+                            }
+                            reader.endObject();
+                            Rezult = true; // успешно
+                        }
+                        else { // те которые пропускем, все равно проходим
+                            reader.beginObject();
+                            while (reader.hasNext()) { reader.skipValue(); }
+                            reader.endObject();
+                        }
+                    }
+                    reader.close();
+
+                    if (!Rezult) {
+                        System.out.println(mPath + " Тип " + typeDB + " в файл не найден. Запись в DB невозможна");
+                    }
+
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                    //Main.MessageBoxError(e.toString(), "");
+                    System.out.println(mPath + " " + e.toString());
+                    Rezult = false; // не успешно
+                }
+            }
+        }
+
+        public String GetJDBCConnection() { return JDBCConnection; }
+        public String GetDBUser() { return DBUser; }
+        public String GetDBPassword() { return DBPassword; }
+        public String GetDBInsertSchema() { return DBInsertSchema; }
+        public String GetDBInsertProcedure() { return DBInsertProcedure; }
+        public boolean GetRezult() { return Rezult; }
+    }
+
     // Подключение к DB и создание базы данных SQLite
     public Connection ConnectionSQLite()
     {
+        ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("SQLite");
+        if (!ConnDB.GetRezult()) { return null; }
+
         Connection connection = null;
         try
         {
             // create a database connection
-            connection = DriverManager.getConnection("jdbc:sqlite:CurrencyChartFXMaven.db");
+            connection = DriverManager.getConnection(ConnDB.JDBCConnection);
         }
         catch(SQLException e)
         {
@@ -950,6 +1060,8 @@ public class curr_chart_Controller {
         {
             // create a database connection
             connection = ConnectionSQLite();
+            if (connection == null) { return; }
+
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
             // создать таблицу, если её нет
@@ -1027,6 +1139,8 @@ public class curr_chart_Controller {
         try {
             // create a database connection
             connection = ConnectionSQLite();
+            if (connection == null) { return; }
+
             for (int iii = 0; iii < mArray[0].length; iii++) {
                 String INSERT_SQL = "INSERT OR IGNORE INTO CURS(curs_date, curr_code, rate) VALUES(?, ?, ?);";
                 PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
@@ -1061,11 +1175,14 @@ public class curr_chart_Controller {
     // Подключение к DB MySQL
     public Connection ConnectionMySQL()
     {
+        ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("MySQL");
+        if (!ConnDB.GetRezult()) { return null; }
+
         Connection connection = null;
         try
         {
             // create a database connection
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test_schemas", "test_user", "12345678");
+            connection = DriverManager.getConnection(ConnDB.JDBCConnection, ConnDB.DBUser, ConnDB.DBPassword);
         }
         catch(SQLException e)
         {
@@ -1083,11 +1200,13 @@ public class curr_chart_Controller {
             connection = ConnectionMySQL();
             if (connection == null) { return; }
 
+            ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("MySQL");
+
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
             for (int iii = 0; iii < mArray[0].length; iii++) {
-                String INSERT_SQL = "CALL `test_schemas`.`INSERT_CURS`(?, ?, ?);";
+                String INSERT_SQL = "CALL `" + ConnDB.DBInsertSchema + "`.`" + ConnDB.DBInsertProcedure + "`(?, ?, ?);";
                 PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
                 ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
                         mArray[0][iii].substring(4, 6) + "-" +
@@ -1120,11 +1239,14 @@ public class curr_chart_Controller {
     // Подключение к DB PostgreSQL
     public Connection ConnectionPostgreSQL()
     {
+        ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("PostgreSQL");
+        if (!ConnDB.GetRezult()) { return null; }
+
         Connection connection = null;
         try
         {
             // create a database connection
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost/test_database", "test_user", "12345678");
+            connection = DriverManager.getConnection(ConnDB.JDBCConnection, ConnDB.DBUser, ConnDB.DBPassword);
         }
         catch(SQLException e)
         {
@@ -1142,11 +1264,13 @@ public class curr_chart_Controller {
             connection = ConnectionPostgreSQL();
             if (connection == null) { return; }
 
+            ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("PostgreSQL");
+
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
             for (int iii = 0; iii < mArray[0].length; iii++) {
-                String INSERT_SQL = "CALL test_schemas.INSERT_CURS(?, ?, ?)";
+                String INSERT_SQL = "CALL " + ConnDB.DBInsertSchema + "." + ConnDB.DBInsertProcedure + "(?, ?, ?)";
                 PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
                 ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
                         mArray[0][iii].substring(4, 6) + "-" +
@@ -1179,11 +1303,14 @@ public class curr_chart_Controller {
     // Подключение к DB Oracle
     public Connection ConnectionOracle()
     {
+        ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("Oracle");
+        if (!ConnDB.GetRezult()) { return null; }
+
         Connection connection = null;
         try
         {
             // create a database connection
-            connection = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:XE", "TEST_USER", "TEST_USER");
+            connection = DriverManager.getConnection(ConnDB.JDBCConnection, ConnDB.DBUser, ConnDB.DBPassword);
         }
         catch(SQLException e)
         {
@@ -1201,11 +1328,13 @@ public class curr_chart_Controller {
             connection = ConnectionOracle();
             if (connection == null) { return; }
 
+            ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("Oracle");
+
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
             for (int iii = 0; iii < mArray[0].length; iii++) {
-                String INSERT_SQL = "CALL TEST_USER.INSERT_KURS(?, ?, ?)";
+                String INSERT_SQL = "CALL " + ConnDB.DBInsertSchema + "." + ConnDB.DBInsertProcedure + "(?, ?, ?)";
                 PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
                 ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
                         mArray[0][iii].substring(4, 6) + "-" +
@@ -1238,11 +1367,14 @@ public class curr_chart_Controller {
     // Подключение к DB MSSQL
     public Connection ConnectionMSSQL()
     {
+        ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("MSSQL");
+        if (!ConnDB.GetRezult()) { return null; }
+
         Connection connection = null;
         try
         {
             // create a database connection
-            connection = DriverManager.getConnection("jdbc:sqlserver://localhost;databaseName=DatabaseTestDB;integratedSecurity=true;");
+            connection = DriverManager.getConnection(ConnDB.JDBCConnection);
         }
         catch(SQLException e)
         {
@@ -1260,11 +1392,13 @@ public class curr_chart_Controller {
             connection = ConnectionMSSQL();
             if (connection == null) { return; }
 
+            ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("MSSQL");
+
             Statement statement = connection.createStatement();
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
 
             for (int iii = 0; iii < mArray[0].length; iii++) {
-                String INSERT_SQL = "{ CALL INSERT_KURS(?, ?, ?) }";
+                String INSERT_SQL = "{ CALL " + ConnDB.DBInsertProcedure + "(?, ?, ?) }";
                 PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
                 ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
                         mArray[0][iii].substring(4, 6) + "-" +

@@ -4,10 +4,12 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
 - Java 17, JavaFX, Maven, JasperReports, JDBC (MS SQL 2019, Oracle XE 21c, PostgreSQL 14, SQLite, MySQL).
 
 Загрузка первичных курсов
+---------------------------------------------------------------------------------
 - https://bank.gov.ua/control/uk/curmetal/currency/search/form/period
 - Указать период и экспорт JSON
 
 Первичная настройка:
+---------------------------------------------------------------------------------
 - скачать и установить IntelliJ IDEA Community
 - скачать и установить Git
 - скачать и установить jdk-17_windows-x64_bin.exe
@@ -16,23 +18,57 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
 - скачать и настроить Maven
 - настроить Github в IntelliJ IDEA Community (Settings - Version Control - Github)
 
-- скачать Download Microsoft JDBC Driver for SQL Server - (sqljdbc_9.4.1.0_rus.zip).
-  - Файл mssql-jdbc_auth-9.4.1.x64.dll скопировать в windows\system32 для подключения в java
-
-  - При разработке отчетов в Jaspersoft® Studio 6.18.1 для MSSQL 2019 возникает ошибка
-    java.lang.UnsatisfiedLinkError: Native Library .\mssql-jdbc_auth-9.4.1.x64.dll already loaded in another classloader) методы лечения в интернете не подошли
-    При выполнении в java не появляется, видимо проблема Jaspersoft® Studio 6.18.1
-
-Настройка JavaFX
+Настройка JavaFX:
+---------------------------------------------------------------------------------
 - https://www.jetbrains.com/help/idea/javafx.html#check-plugin
 - IntelliJ IDEA -> File -> Settings -> Languages and Frameworks -> JavaFX -> Указать путь к SceneBuilder (C:\Users\Admin\AppData\Local\SceneBuilder\SceneBuilder.exe)
 - Папка при смене версии JavaFX не менять = \javafx-sdk\
 
 Настройка отчетов:
+---------------------------------------------------------------------------------
 - TIB_js-studiocomm_6.18.1_windows_x86_64.exe, запустить TIBCO Jaspersoft Studio-6.18.1
 - распаковать JaspersoftWorkspace.7z в C:\Users\Admin\JaspersoftWorkspace
+- изменить настройки Datasource если необходимо
+  - !!! При разработке отчетов в Jaspersoft® Studio 6.18.1 для MSSQL 2019 возникает ошибка
+    java.lang.UnsatisfiedLinkError: Native Library .\mssql-jdbc_auth-9.4.1.x64.dll already loaded in another classloader) методы лечения в интернете не подошли
+    При выполнении в java не появляется, видимо проблема Jaspersoft® Studio 6.18.1
 
-Сборка
+Настройка баз данных (+ JDBC Driver):
+---------------------------------------------------------------------------------
+- SQLite (ничего, создание таблиц, представлений и процедур автоматизировано в коде программы)
+
+- Oracle XE 21с
+  - после установки меняем в глоб. реестре:
+    - Компьютер\HKEY_LOCAL_MACHINE\SOFTWARE\ORACLE\KEY_OraDB21Home1 c AMERICAN_AMERICA.WE8MSWIN1252
+      на NLS_LANG = AMERICAN_AMERICA.AL32UTF8 (либо AMERICAN_AMERICA.CL8MSWIN1251)
+  - sqldeveloper выполяем скрипты из папки .\oracle_sql\
+    - под пользователем SYS (1_CREATE_DATABASE_AND_USER.sql)
+    - остальные под пользователем TEST_USER
+
+- MS SQL 2019
+  - скачать Download Microsoft JDBC Driver for SQL Server - (sqljdbc_9.4.1.0_rus.zip).
+  - Файл mssql-jdbc_auth-9.4.1.x64.dll скопировать в windows\system32 для подключения в java
+  Для работы jdbc:
+  - You need to Go to Start > Microsoft SQL Server > Configuration Tools > SQL Server Configuration Manager
+  - SQL Server Configuration Manager > SQL Server Network Configuration > Protocols for MSSQLSERVER
+    - Где вы найдете протокол TCP/IP, если он отключен, затем Включите его.
+    - Нажмите на TCP/IP, вы найдете его свойства.
+    - Вкладка Protocol - Enabled - Yes
+    - Вкладка IP Addresses - IP10 - Enabled - Yes (там где IP address - 127.0.0.1)
+    - Вкладка IP Addresses - IP9  - Enabled - Yes (там где IP address - ::1)
+    - В этих свойствах Удалите все динамические порты TCP и добавьте значение 1433 во все TCP-порт (если они есть, по умолчанию не было)
+    - Перезапустите службы SQL Server > SQL Server
+  - Microsoft SQL Server Management Studio 18 выполяем скрипты из папки .\mssql_sql\
+
+- PostgreSQL 14
+  - DBeaver выполяем скрипты из папки .\postgee_sql\ (при подключении вкладка PostgreSQL отображать все базы данных)
+    - открыть SQL скрипт -> Выполнить SQL скрипт (Alt+X)
+
+- MySQL
+  - MySQL Workbench выполяем скрипты из папки .\mysql_sql\
+
+Сборка:
+---------------------------------------------------------------------------------
 - Build - Build Artifacts.. - Build
 
 Fix:
@@ -42,3 +78,4 @@ Exception in thread "main" java.lang.SecurityException: Invalid signature file d
 - JAR File from Libraries Select copy to the output directory and link via manifest
 
 !!! Для JAR удалять Artifacts и создавать заново при добавлении новых в maven (IntelliJ IDEA -> File -> Project Structure -> Add New (Artifacts) -> jar).
+
