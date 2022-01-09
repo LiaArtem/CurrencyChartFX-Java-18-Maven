@@ -41,9 +41,13 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
   - после установки меняем в глоб. реестре:
     - Компьютер\HKEY_LOCAL_MACHINE\SOFTWARE\ORACLE\KEY_OraDB21Home1 c AMERICAN_AMERICA.WE8MSWIN1252
       на NLS_LANG = AMERICAN_AMERICA.AL32UTF8 (либо AMERICAN_AMERICA.CL8MSWIN1251)
-  - sqldeveloper выполяем скрипты из папки .\oracle_sql\
+  - Oracle SQL Developer выполяем скрипты из папки .\oracle_sql\
     - под пользователем SYS (1_CREATE_DATABASE_AND_USER.sql)
     - остальные под пользователем TEST_USER
+   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   !!! Перед загрузкой скриптов нужно настроить обязательно (экспорт таблиц выполнен в UTF-8).
+   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   Настраиваем кодировку с среде Oracle SQL Developer - Tools -> Preferences -> Environment -> Encoding (меняем на UTF-8).
 
 - MS SQL 2019
   - скачать Download Microsoft JDBC Driver for SQL Server - (sqljdbc_9.4.1.0_rus.zip).
