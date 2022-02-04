@@ -44,10 +44,8 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
   - Oracle SQL Developer выполяем скрипты из папки .\oracle_sql\
     - под пользователем SYS (1_CREATE_DATABASE_AND_USER.sql)
     - остальные под пользователем TEST_USER
-   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   !!! Перед загрузкой скриптов нужно настроить обязательно (экспорт таблиц выполнен в UTF-8).
-   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   Настраиваем кодировку с среде Oracle SQL Developer - Tools -> Preferences -> Environment -> Encoding (меняем на UTF-8).
+    - !!! Перед загрузкой скриптов нужно настроить обязательно (экспорт таблиц выполнен в UTF-8).
+    - !!! Настраиваем кодировку с среде Oracle SQL Developer - Tools -> Preferences -> Environment -> Encoding (меняем на UTF-8).
 
 - MS SQL 2019
   - скачать Download Microsoft JDBC Driver for SQL Server - (sqljdbc_X.X.X.X_rus.zip).
