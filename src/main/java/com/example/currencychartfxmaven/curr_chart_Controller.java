@@ -1,7 +1,6 @@
 package com.example.currencychartfxmaven;
 
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -1187,6 +1186,7 @@ public class curr_chart_Controller {
         catch(SQLException e)
         {
             connection = null;
+            System.out.println("ConnectionMySQL: " + e.getMessage());
         }
         return connection;
     }
@@ -1251,6 +1251,7 @@ public class curr_chart_Controller {
         catch(SQLException e)
         {
             connection = null;
+            System.out.println("ConnectionPostgreSQL: " + e.getMessage());
         }
         return connection;
     }
@@ -1315,6 +1316,7 @@ public class curr_chart_Controller {
         catch(SQLException e)
         {
             connection = null;
+            System.out.println("ConnectionOracle: " + e.getMessage());
         }
         return connection;
     }
@@ -1379,6 +1381,7 @@ public class curr_chart_Controller {
         catch(SQLException e)
         {
             connection = null;
+            System.out.println("ConnectionMSSQL: " + e.getMessage());
         }
         return connection;
     }

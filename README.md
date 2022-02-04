@@ -30,7 +30,7 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
 - распаковать JaspersoftWorkspace.7z в C:\Users\Admin\JaspersoftWorkspace
 - изменить настройки Datasource если необходимо
   - !!! При разработке отчетов в Jaspersoft® Studio 6.18.1 для MSSQL 2019 возникает ошибка
-    java.lang.UnsatisfiedLinkError: Native Library .\mssql-jdbc_auth-9.4.1.x64.dll already loaded in another classloader) методы лечения в интернете не подошли
+    java.lang.UnsatisfiedLinkError: Native Library .\mssql-jdbc_auth-X.X.X.x64.dll already loaded in another classloader) методы лечения в интернете не подошли
     При выполнении в java не появляется, видимо проблема Jaspersoft® Studio 6.18.1
 
 Настройка баз данных (+ JDBC Driver):
@@ -50,23 +50,24 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
    Настраиваем кодировку с среде Oracle SQL Developer - Tools -> Preferences -> Environment -> Encoding (меняем на UTF-8).
 
 - MS SQL 2019
-  - скачать Download Microsoft JDBC Driver for SQL Server - (sqljdbc_9.4.1.0_rus.zip).
-  - Файл mssql-jdbc_auth-9.4.1.x64.dll скопировать в windows\system32 для подключения в java
+  - скачать Download Microsoft JDBC Driver for SQL Server - (sqljdbc_X.X.X.X_rus.zip).
+  - Файл mssql-jdbc_auth-X.X.X.x64.dll скопировать в windows\system32 для подключения в java
   Для работы jdbc:
   - You need to Go to Start > Microsoft SQL Server > Configuration Tools > SQL Server Configuration Manager
   - SQL Server Configuration Manager > SQL Server Network Configuration > Protocols for MSSQLSERVER
     - Где вы найдете протокол TCP/IP, если он отключен, затем Включите его.
     - Нажмите на TCP/IP, вы найдете его свойства.
-    - Вкладка Protocol - Enabled - Yes
-    - Вкладка IP Addresses - IP10 - Enabled - Yes (там где IP address - 127.0.0.1)
-    - Вкладка IP Addresses - IP9  - Enabled - Yes (там где IP address - ::1)
+    - !!! Вкладка Protocol - Enabled - Yes
+    - !!! Вкладка IP Addresses - IP10 - Enabled - Yes (там где IP address - 127.0.0.1)
+    - !!! Вкладка IP Addresses - IP9  - Enabled - Yes (там где IP address - ::1)
     - В этих свойствах Удалите все динамические порты TCP и добавьте значение 1433 во все TCP-порт (если они есть, по умолчанию не было)
     - Перезапустите службы SQL Server > SQL Server
   - Microsoft SQL Server Management Studio 18 выполяем скрипты из папки .\mssql_sql\
 
 - PostgreSQL 14
   - DBeaver выполяем скрипты из папки .\postgee_sql\ (при подключении вкладка PostgreSQL отображать все базы данных)
-    - открыть SQL скрипт -> Выполнить SQL скрипт (Alt+X)
+    - открыть SQL скрипт -> Выполнить SQL скрипт (Alt+X) (Файлы со скриптами в UTF8 - база в cp1251, при открытии могут быть иероглифы,
+      тогда просто скопировать текст и вставить в окно SQL скрипта и выполнить)
 
 - MySQL
   - MySQL Workbench выполяем скрипты из папки .\mysql_sql\

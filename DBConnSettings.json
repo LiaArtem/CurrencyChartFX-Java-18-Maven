@@ -24,7 +24,7 @@
          "DBInsertProcedure": "INSERT_KURS"
          },
     "ConnectionMSSQL": {
-         "JDBCConnection": "jdbc:sqlserver://localhost;databaseName=DatabaseTestDB;integratedSecurity=true;",
+         "JDBCConnection": "jdbc:sqlserver://localhost;databaseName=DatabaseTestDB;integratedSecurity=true;encrypt=false;",
          "DBInsertProcedure": "INSERT_KURS"
          }
 }

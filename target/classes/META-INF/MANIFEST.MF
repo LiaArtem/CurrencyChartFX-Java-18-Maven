@@ -1,17 +1,17 @@
 Manifest-Version: 1.0
 Main-Class: com.example.currencychartfxmaven.Main
-Class-Path: castor-xml-1.4.1.jar javafx-base-17.0.0.1.jar gson-2.8.5.jar
-  javax.activation-api-1.2.0.jar javafx-fxml-17.0.0.1-win.jar javafx-bas
- e-17.0.0.1-win.jar javax.inject-1.jar jasperreports-fonts-6.18.1.jar ms
- sql-jdbc-9.4.1.jre16.jar javafx-controls-17.0.0.1.jar ecj-3.21.0.jar co
- mmons-logging-1.1.1.jar checker-qual-3.5.0.jar commons-beanutils-1.9.4.
- jar commons-digester-2.1.jar javafx-graphics-17.0.0.1-win.jar mysql-con
- nector-java-8.0.27.jar jackson-annotations-2.12.2.jar javafx-graphics-1
- 7.0.0.1.jar jackson-databind-2.12.2.jar protobuf-java-3.11.4.jar sqlite
- -jdbc-3.36.0.2.jar jfreechart-1.0.19.jar bcprov-jdk15on-1.68.jar javafx
- -controls-17.0.0.1-win.jar itext-2.1.7.js9.jar commons-lang3-3.4.jar oj
- dbc11-21.3.0.0.jar jasperreports-6.18.1.jar commons-collections-3.2.2.j
- ar castor-core-1.4.1.jar jcommon-1.0.23.jar jaxb-api-2.3.1.jar commons-
- collections4-4.2.jar javafx-fxml-17.0.0.1.jar jackson-core-2.12.2.jar p
- ostgresql-42.3.1.jar
+Class-Path: commons-digester-2.1.jar jackson-databind-2.12.2.jar jasperr
+ eports-fonts-6.18.1.jar javafx-controls-17.0.2-win.jar postgresql-42.3.
+ 2.jar javafx-base-17.0.2.jar javafx-controls-17.0.2.jar javafx-base-17.
+ 0.2-win.jar jcommon-1.0.23.jar gson-2.8.9.jar jackson-core-2.12.2.jar c
+ ommons-beanutils-1.9.4.jar javafx-graphics-17.0.2-win.jar castor-core-1
+ .4.1.jar javax.activation-api-1.2.0.jar commons-lang3-3.4.jar mssql-jdb
+ c-10.2.0.jre17.jar ecj-3.21.0.jar protobuf-java-3.11.4.jar commons-coll
+ ections-3.2.2.jar checker-qual-3.5.0.jar castor-xml-1.4.1.jar javafx-fx
+ ml-17.0.2.jar commons-logging-1.1.1.jar itext-2.1.7.js9.jar jasperrepor
+ ts-6.18.1.jar commons-collections4-4.2.jar javax.inject-1.jar jfreechar
+ t-1.0.19.jar javafx-fxml-17.0.2-win.jar bcprov-jdk15on-1.68.jar jaxb-ap
+ i-2.3.1.jar ojdbc11-21.5.0.0.jar jackson-annotations-2.12.2.jar mysql-c
+ onnector-java-8.0.28.jar javafx-graphics-17.0.2.jar sqlite-jdbc-3.36.0.
+ 3.jar
 
