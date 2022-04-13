@@ -1,7 +1,7 @@
-# CurrencyChartFX-Java-17-Maven
+# CurrencyChartFX-Java-18-Maven
 
 Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU on years for watching of tendencies of change.
-- Java 17, JavaFX, Maven, JasperReports, JDBC (MS SQL 2019, Oracle XE 21c, PostgreSQL 14, SQLite, MySQL).
+- Java 18, JavaFX, Maven, JasperReports, JDBC (MS SQL 2019, Oracle XE 21c, PostgreSQL 14, SQLite, MySQL).
 
 Загрузка первичных курсов
 ---------------------------------------------------------------------------------
@@ -12,9 +12,9 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
 ---------------------------------------------------------------------------------
 - скачать и установить IntelliJ IDEA Community
 - скачать и установить Git
-- скачать и установить jdk-17_windows-x64_bin.exe
-- скачать и установить SceneBuilder-17.0.0
-- скачать и установить TIB_js-studiocomm_6.18.1_windows_x86_64.exe
+- скачать и установить jdk-18_windows-x64_bin.exe
+- скачать и установить SceneBuilder-18.0.0
+- скачать и установить TIB_js-studiocomm_6.19.0_windows_x86_64.exe
 - скачать и настроить Maven
 - настроить Github в IntelliJ IDEA Community (Settings - Version Control - Github)
 
@@ -26,10 +26,10 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
 
 Настройка отчетов:
 ---------------------------------------------------------------------------------
-- TIB_js-studiocomm_6.18.1_windows_x86_64.exe, запустить TIBCO Jaspersoft Studio-6.18.1
+- TIB_js-studiocomm_6.19.0_windows_x86_64.exe, запустить TIBCO Jaspersoft Studio-6.19.0
 - распаковать JaspersoftWorkspace.7z в C:\Users\Admin\JaspersoftWorkspace
 - изменить настройки Datasource если необходимо
-  - !!! При разработке отчетов в Jaspersoft® Studio 6.18.1 для MSSQL 2019 возникает ошибка
+  - !!! При разработке отчетов в Jaspersoft® Studio 6.19.0 для MSSQL 2019 возникает ошибка
     java.lang.UnsatisfiedLinkError: Native Library .\mssql-jdbc_auth-X.X.X.x64.dll already loaded in another classloader) методы лечения в интернете не подошли
     При выполнении в java не появляется, видимо проблема Jaspersoft® Studio 6.18.1
 
@@ -61,6 +61,7 @@ Maven JavaFX IntelliJ IDEA project - Construction of charts of currencies of NBU
     - В этих свойствах Удалите все динамические порты TCP и добавьте значение 1433 во все TCP-порт (если они есть, по умолчанию не было)
     - Перезапустите службы SQL Server > SQL Server
   - Microsoft SQL Server Management Studio 18 выполяем скрипты из папки .\mssql_sql\
+    !!!! 1_CREATE_DATABASE.sql в меню (Query -> SQLCMD Mode)
 
 - PostgreSQL 14
   - DBeaver выполяем скрипты из папки .\postgee_sql\ (при подключении вкладка PostgreSQL отображать все базы данных)
