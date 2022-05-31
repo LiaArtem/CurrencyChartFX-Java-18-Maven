@@ -54,6 +54,10 @@ public class curr_chart_Controller {
                                                                                     "21", "22", "23", "24", "25", "26", "27", "28", "29", "30",
                                                                                     "31");
     private final ObservableList<String> source_code_List = FXCollections.observableArrayList("Из файла JSON", "С сайта НБУ");
+
+    private final ObservableList<String> report_code_List = FXCollections.observableArrayList("Отчет - Без базы данных", "Отчет - база данных SQLite", "Отчет - база данных MySQL",
+                                                                                            "Отчет - база данных PostgreSQL", "Отчет - база данных Oracle", "Отчет - база данных MSSQL",
+                                                                                             "Отчет - база данных AzureSQL");
     private static final String tec_kat = new File("").getAbsolutePath();
     private static final String tec_kat_curs = tec_kat + File.separator + "temp";
 
@@ -78,6 +82,7 @@ public class curr_chart_Controller {
     @FXML private ComboBox<String> source_code;
     @FXML private CheckBox del_cache_file;
     @FXML private CheckBox not_create_cache_file;
+    @FXML private ComboBox<String> report_code;
 
     @FXML
     private void initialize() throws TransformerException {
@@ -119,6 +124,10 @@ public class curr_chart_Controller {
         not_create_cache_file.setDisable(true);
         not_create_cache_file.setSelected(false);
 
+        // по умолчанию - отчет
+        report_code.setItems(report_code_List);
+        report_code.getSelectionModel().select(0); // первое значение
+
         // Создание базы данных SQLite и создание таблицы для добавления данных
         CreateTableSQLite();
 
@@ -134,9 +143,49 @@ public class curr_chart_Controller {
         Calc_range();
     }
 
-    // кнопка - Report - No DB
+    // кнопка - Ссылка на курсы НБУ
+    @FXML
+    private void button_curs_nbuActionPerformed() {
+        // Ссылка на курсы НБУ
+        try {
+            Desktop d = Desktop.getDesktop();
+            d.browse(new URI("https://bank.gov.ua/control/uk/curmetal/currency/search/form/period"));
+        }
+        catch (Exception ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+    // поле со списком - источник данных
+    @FXML
+    private void source_codeAction() {
+        // блокируем кнопку если из сайта
+        button_curs_nbu.setDisable(false);
+        del_cache_file.setDisable(true);
+        not_create_cache_file.setDisable(true);
+        if (source_code.getSelectionModel().getSelectedIndex() == 1) {
+            button_curs_nbu.setDisable(true);
+            del_cache_file.setDisable(false);
+            not_create_cache_file.setDisable(false);
+        }
+    }
+
+    // кнопка - Report
     @FXML
     private void Report_buttonActionPerformed() throws JRException, IOException {
+        switch (report_code.getSelectionModel().getSelectedIndex()) {
+            case 1 -> Report_SQLite();
+            case 2 -> Report_MySQL();
+            case 3 -> Report_PostgreSQL();
+            case 4 -> Report_Oracle();
+            case 5 -> Report_MSSQL();
+            case 6 -> Report_AzureSQL();
+            default -> Report_No_DB();
+        }
+    }
+
+    // Report - No DB
+    private void Report_No_DB() throws JRException, IOException {
         // Генерация отчета
         String file_name = "StyledTextReport";
         String mPath_sample = tec_kat + File.separator + "report_sample";
@@ -165,17 +214,17 @@ public class curr_chart_Controller {
 
         // Отобразить файл на экране
         File file = new File(mPath_export + File.separator + file_name + ".pdf");
-        if (file.toString().endsWith(".pdf"))
-            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
-        else {
-            Desktop desktop = Desktop.getDesktop();
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.OPEN)) {
             desktop.open(file);
+        }
+        else {
+            Main.MessageBoxError("Открытие файла pdf не поддерживается", "Ошибка");
         }
     }
 
-    // кнопка - ReportDB - DB SQLite
-    @FXML
-    private void Report_buttonDBActionPerformed() throws JRException, IOException {
+    // Report - DB SQLite
+    private void Report_SQLite() throws JRException, IOException {
         // Генерация отчета
         String file_name = "CurrencyChartFXMavenReport";
         String mPath_sample = tec_kat + File.separator + "report_sample";
@@ -209,17 +258,17 @@ public class curr_chart_Controller {
 
         // Отобразить файл на экране
         File file = new File(mPath_export + File.separator + file_name + ".pdf");
-        if (file.toString().endsWith(".pdf"))
-            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
-        else {
-            Desktop desktop = Desktop.getDesktop();
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.OPEN)) {
             desktop.open(file);
+        }
+        else {
+            Main.MessageBoxError("Открытие файла pdf не поддерживается", "Ошибка");
         }
     }
 
-    // кнопка - ReportDB2 - DB MySQL
-    @FXML
-    private void Report_buttonDB2ActionPerformed() throws JRException, IOException {
+    // Report - DB MySQL
+    private void Report_MySQL() throws JRException, IOException {
         // Генерация отчета
         String file_name = "CurrencyChartFXMavenReportMySQL";
         String mPath_sample = tec_kat + File.separator + "report_sample";
@@ -253,17 +302,17 @@ public class curr_chart_Controller {
 
         // Отобразить файл на экране
         File file = new File(mPath_export + File.separator + file_name + ".pdf");
-        if (file.toString().endsWith(".pdf"))
-            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
-        else {
-            Desktop desktop = Desktop.getDesktop();
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.OPEN)) {
             desktop.open(file);
+        }
+        else {
+            Main.MessageBoxError("Открытие файла pdf не поддерживается", "Ошибка");
         }
     }
 
-    // кнопка - ReportDB3 - DB PostgreSQL
-    @FXML
-    private void Report_buttonDB3ActionPerformed() throws JRException, IOException {
+    // Report - PostgreSQL
+    private void Report_PostgreSQL() throws JRException, IOException {
         // Генерация отчета
         String file_name = "CurrencyChartFXMavenReportPostgreSQL";
         String mPath_sample = tec_kat + File.separator + "report_sample";
@@ -297,17 +346,17 @@ public class curr_chart_Controller {
 
         // Отобразить файл на экране
         File file = new File(mPath_export + File.separator + file_name + ".pdf");
-        if (file.toString().endsWith(".pdf"))
-            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
-        else {
-            Desktop desktop = Desktop.getDesktop();
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.OPEN)) {
             desktop.open(file);
+        }
+        else {
+            Main.MessageBoxError("Открытие файла pdf не поддерживается", "Ошибка");
         }
     }
 
-    // кнопка - ReportDB4 - DB Oracle
-    @FXML
-    private void Report_buttonDB4ActionPerformed() throws JRException, IOException {
+    // Report - DB Oracle
+    private void Report_Oracle() throws JRException, IOException {
         // Генерация отчета
         String file_name = "CurrencyChartFXMavenReportOracle";
         String mPath_sample = tec_kat + File.separator + "report_sample";
@@ -341,17 +390,17 @@ public class curr_chart_Controller {
 
         // Отобразить файл на экране
         File file = new File(mPath_export + File.separator + file_name + ".pdf");
-        if (file.toString().endsWith(".pdf"))
-            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
-        else {
-            Desktop desktop = Desktop.getDesktop();
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.OPEN)) {
             desktop.open(file);
+        }
+        else {
+            Main.MessageBoxError("Открытие файла pdf не поддерживается", "Ошибка");
         }
     }
 
-    // кнопка - ReportDB5 - DB MSSQL
-    @FXML
-    private void Report_buttonDB5ActionPerformed() throws JRException, IOException {
+    // Report - DB MSSQL
+    private void Report_MSSQL() throws JRException, IOException {
         // Генерация отчета
         String file_name = "CurrencyChartFXMavenReportMSSQL";
         String mPath_sample = tec_kat + File.separator + "report_sample";
@@ -385,38 +434,56 @@ public class curr_chart_Controller {
 
         // Отобразить файл на экране
         File file = new File(mPath_export + File.separator + file_name + ".pdf");
-        if (file.toString().endsWith(".pdf"))
-            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + file);
-        else {
-            Desktop desktop = Desktop.getDesktop();
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.OPEN)) {
             desktop.open(file);
         }
-    }
-
-    // кнопка - Ссылка на курсы НБУ
-    @FXML
-    private void button_curs_nbuActionPerformed() {
-        // Ссылка на курсы НБУ
-        try {
-            Desktop d = Desktop.getDesktop();
-            d.browse(new URI("https://bank.gov.ua/control/uk/curmetal/currency/search/form/period"));
-        }
-        catch (Exception ioe) {
-            ioe.printStackTrace();
+        else {
+            Main.MessageBoxError("Открытие файла pdf не поддерживается", "Ошибка");
         }
     }
 
-    // поле со списком - источник данных
-    @FXML
-    private void source_codeAction() {
-        // блокируем кнопку если из сайта
-        button_curs_nbu.setDisable(false);
-        del_cache_file.setDisable(true);
-        not_create_cache_file.setDisable(true);
-        if (source_code.getSelectionModel().getSelectedIndex() == 1) {
-            button_curs_nbu.setDisable(true);
-            del_cache_file.setDisable(false);
-            not_create_cache_file.setDisable(false);
+    // Report - DB AzureSQL
+    private void Report_AzureSQL() throws JRException, IOException {
+        // Генерация отчета
+        String file_name = "CurrencyChartFXMavenReportAzureSQL";
+        String mPath_sample = tec_kat + File.separator + "report_sample";
+        String mPath_export = tec_kat + File.separator + "report_export";
+
+        // Компиляция jrxml файла
+        JasperReport jasperReport = JasperCompileManager
+                .compileReport(mPath_sample + File.separator + file_name + ".jrxml");
+
+        // Параметры для отчета
+        Map<String, Object> parameters = new HashMap<>();
+
+        Connection connection = ConnectionAzureSQL();
+        if (connection == null) {
+            Main.MessageBoxError("Ошибка подключения к DB", "Ошибка ConnectionAzureSQL");
+            return;
+        }
+
+        // DataSource
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, connection);
+
+        // Проверка папки для экспорта
+        boolean mkdirs_result = new File(mPath_export).mkdirs();
+        if (!mkdirs_result) {
+            System.out.println(mPath_export + " Каталог уже существует");
+        }
+
+        // Экспорт в PDF
+        JasperExportManager.exportReportToPdfFile(jasperPrint,
+                mPath_export + File.separator + file_name + ".pdf");
+
+        // Отобразить файл на экране
+        File file = new File(mPath_export + File.separator + file_name + ".pdf");
+        Desktop desktop = Desktop.getDesktop();
+        if (desktop.isSupported(Desktop.Action.OPEN)) {
+            desktop.open(file);
+        }
+        else {
+            Main.MessageBoxError("Открытие файла pdf не поддерживается", "Ошибка");
         }
     }
 
@@ -538,6 +605,9 @@ public class curr_chart_Controller {
 
         // Добавление данных в базу DB MSSQL
         AddTableMSSQL(mCurrCode, mArray);
+
+        // Добавление данных в базу DB AzureSQL
+        AddTableAzureSQL(mCurrCode, mArray);
 
     }
 
@@ -956,7 +1026,7 @@ public class curr_chart_Controller {
         return getDateString(m_date, "dd.MM.yyyy");
     }
 
-    public class ConnectionFileDataDB
+    public static class ConnectionFileDataDB
     {
         private String JDBCConnection;
         private String DBUser;
@@ -986,18 +1056,13 @@ public class curr_chart_Controller {
                             reader.beginObject();
                             while (reader.hasNext()) {
                                 name = reader.nextName();
-                                if (name.equals("JDBCConnection")) {
-                                    JDBCConnection = reader.nextString();
-                                } else if (name.equals("DBUser")) {
-                                    DBUser = reader.nextString();
-                                } else if (name.equals("DBPassword")) {
-                                    DBPassword = reader.nextString();
-                                } else if (name.equals("DBInsertSchema")) {
-                                    DBInsertSchema = reader.nextString();
-                                } else if (name.equals("DBInsertProcedure")) {
-                                    DBInsertProcedure = reader.nextString();
-                                } else {
-                                    reader.skipValue();
+                                switch (name) {
+                                    case "JDBCConnection" -> JDBCConnection = reader.nextString();
+                                    case "DBUser" -> DBUser = reader.nextString();
+                                    case "DBPassword" -> DBPassword = reader.nextString();
+                                    case "DBInsertSchema" -> DBInsertSchema = reader.nextString();
+                                    case "DBInsertProcedure" -> DBInsertProcedure = reader.nextString();
+                                    default -> reader.skipValue();
                                 }
                             }
                             reader.endObject();
@@ -1016,27 +1081,20 @@ public class curr_chart_Controller {
                     }
 
                 } catch (IOException e) {
-                    //e.printStackTrace();
-                    //Main.MessageBoxError(e.toString(), "");
-                    System.out.println(mPath + " " + e.toString());
+                    System.out.println(mPath + " " + e);
                     Rezult = false; // не успешно
                 }
             }
         }
 
-        public String GetJDBCConnection() { return JDBCConnection; }
-        public String GetDBUser() { return DBUser; }
-        public String GetDBPassword() { return DBPassword; }
-        public String GetDBInsertSchema() { return DBInsertSchema; }
-        public String GetDBInsertProcedure() { return DBInsertProcedure; }
-        public boolean GetRezult() { return Rezult; }
+        public boolean GetRezult() { return !Rezult; }
     }
 
     // Подключение к DB и создание базы данных SQLite
     public Connection ConnectionSQLite()
     {
         ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("SQLite");
-        if (!ConnDB.GetRezult()) { return null; }
+        if (ConnDB.GetRezult()) { return null; }
 
         Connection connection = null;
         try
@@ -1175,9 +1233,9 @@ public class curr_chart_Controller {
     public Connection ConnectionMySQL()
     {
         ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("MySQL");
-        if (!ConnDB.GetRezult()) { return null; }
+        if (ConnDB.GetRezult()) { return null; }
 
-        Connection connection = null;
+        Connection connection;
         try
         {
             // create a database connection
@@ -1240,9 +1298,9 @@ public class curr_chart_Controller {
     public Connection ConnectionPostgreSQL()
     {
         ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("PostgreSQL");
-        if (!ConnDB.GetRezult()) { return null; }
+        if (ConnDB.GetRezult()) { return null; }
 
-        Connection connection = null;
+        Connection connection;
         try
         {
             // create a database connection
@@ -1305,9 +1363,9 @@ public class curr_chart_Controller {
     public Connection ConnectionOracle()
     {
         ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("Oracle");
-        if (!ConnDB.GetRezult()) { return null; }
+        if (ConnDB.GetRezult()) { return null; }
 
-        Connection connection = null;
+        Connection connection;
         try
         {
             // create a database connection
@@ -1370,9 +1428,9 @@ public class curr_chart_Controller {
     public Connection ConnectionMSSQL()
     {
         ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("MSSQL");
-        if (!ConnDB.GetRezult()) { return null; }
+        if (ConnDB.GetRezult()) { return null; }
 
-        Connection connection = null;
+        Connection connection;
         try
         {
             // create a database connection
@@ -1427,6 +1485,71 @@ public class curr_chart_Controller {
             {
                 // connection close failed.
                 Main.MessageBoxError(e.getMessage(), "Ошибка AddTableMSSQL");
+            }
+        }
+    }
+
+    // Подключение к DB AzureSQL
+    public Connection ConnectionAzureSQL()
+    {
+        ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("AzureSQL");
+        if (ConnDB.GetRezult()) { return null; }
+
+        Connection connection;
+        try
+        {
+            // create a database connection
+            connection = DriverManager.getConnection(ConnDB.JDBCConnection);
+        }
+        catch(SQLException e)
+        {
+            connection = null;
+            System.out.println("ConnectionAzureSQL: " + e.getMessage());
+        }
+        return connection;
+    }
+
+    // Добавление данных в базу AzureSQL
+    public void AddTableAzureSQL(String mCurrCode, String[][] mArray)
+    {
+        Connection connection = null;
+        try {
+            // create a database connection
+            connection = ConnectionMSSQL();
+            if (connection == null) { return; }
+
+            ConnectionFileDataDB ConnDB = new ConnectionFileDataDB("AzureSQL");
+
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            for (int iii = 0; iii < mArray[0].length; iii++) {
+                String INSERT_SQL = "{ CALL " + ConnDB.DBInsertProcedure + "(?, ?, ?) }";
+                PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
+                ps.setString(1, mArray[0][iii].substring(0, 4) + "-" +
+                        mArray[0][iii].substring(4, 6) + "-" +
+                        mArray[0][iii].substring(6, 8)
+                ); // TEXT как строки ISO8601 ("YYYY-MM-DD HH:MM:SS").
+                ps.setString(2, mCurrCode);
+                ps.setDouble(3, Main.getString_Double(mArray[1][iii]));
+                ps.executeUpdate();
+            }
+        }
+        catch(SQLException e)
+        {
+            Main.MessageBoxError(e.getMessage(), "Ошибка AddTableAzureSQL");
+        }
+        finally
+        {
+            try
+            {
+                if(connection != null)
+                    connection.close();
+            }
+            catch(SQLException e)
+            {
+                // connection close failed.
+                Main.MessageBoxError(e.getMessage(), "Ошибка AddTableAzureSQL");
             }
         }
     }

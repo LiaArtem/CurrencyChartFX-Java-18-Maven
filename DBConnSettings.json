@@ -26,5 +26,9 @@
     "ConnectionMSSQL": {
          "JDBCConnection": "jdbc:sqlserver://localhost;databaseName=DatabaseTestDB;integratedSecurity=true;encrypt=false;",
          "DBInsertProcedure": "INSERT_KURS"
+         },
+    "ConnectionAzureSQL": {
+         "JDBCConnection": "jdbc:sqlserver://dbserver-test-lia.database.windows.net:1433;database=TestDB;user=admin-dbserver;password=!Dddsfgdfgdfg34534534534;encrypt=true;loginTimeout=30;",
+         "DBInsertProcedure": "INSERT_KURS"
          }
 }
